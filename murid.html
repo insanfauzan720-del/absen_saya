@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Murid - SiAbsen</title>
+    <meta name="description" content="Manajemen Data Murid SiAbsen">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="brand">SiAbsen</a>
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="murid.html" class="active">Data Murid</a>
+            <a href="absensi.html">Input Absensi</a>
+            <a href="laporan.html">Laporan</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flex justify-between align-center mb-3">
+            <h1>Manajemen Data Murid</h1>
+            <button class="btn btn-primary" onclick="App.openModal('muridModal'); MuridApp.resetForm();">
+                + Tambah Murid
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between align-center mb-2">
+                <input type="text" id="searchInput" placeholder="Cari NIS atau Nama..." style="max-width: 300px;" oninput="MuridApp.renderTable()">
+                <select id="filterKelas" style="max-width: 200px;" onchange="MuridApp.renderTable()">
+                    <option value="">Semua Kelas</option>
+                    <!-- Kelas options will be populated dynamically -->
+                </select>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="muridTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>NIS</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table content goes here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="muridModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Murid</h3>
+                <button class="close-btn" onclick="App.closeModal('muridModal')">&times;</button>
+            </div>
+            <form id="muridForm" onsubmit="MuridApp.saveMurid(event)">
+                <input type="hidden" id="muridId">
+                <div class="form-group">
+                    <label for="nis">NIS</label>
+                    <input type="text" id="nis" required placeholder="Masukkan NIS">
+                </div>
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap</label>
+                    <input type="text" id="nama" required placeholder="Masukkan Nama Lengkap">
+                </div>
+                <div class="form-group">
+                    <label for="kelas">Kelas</label>
+                    <input type="text" id="kelas" required placeholder="Contoh: X IPA 1">
+                </div>
+                <div class="flex justify-between mt-3">
+                    <button type="button" class="btn btn-danger" onclick="App.closeModal('muridModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/murid.js"></script>
+</body>
+</html>

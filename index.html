@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SiAbsen</title>
+    <meta name="description" content="Dashboard Sistem Informasi Absensi Sekolah">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="brand">SiAbsen</a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="murid.html">Data Murid</a>
+            <a href="absensi.html">Input Absensi</a>
+            <a href="laporan.html">Laporan</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flex justify-between align-center mb-3">
+            <h1>Dashboard Overview</h1>
+            <p id="current-date"></p>
+        </div>
+
+        <div class="grid-3 mb-3">
+            <div class="card stat-card">
+                <div class="stat-value" id="total-murid">0</div>
+                <p>Total Murid</p>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-value" id="total-kelas">0</div>
+                <p>Total Kelas</p>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-value" id="kehadiran-hari-ini">0%</div>
+                <p>Kehadiran Hari Ini</p>
+            </div>
+        </div>
+
+        <h2>Peringatan Alpha (3+ Hari Beruntun)</h2>
+        <div class="card">
+            <div id="alpha-warnings">
+                <p class="text-center">Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-date').textContent = App.formatDate(new Date());
+            
+            const murids = Storage.getMurid();
+            const absensi = Storage.getAbsensi();
+            
+            // Calculate stats
+            document.getElementById('total-murid').textContent = murids.length;
+            const uniqueKelas = [...new Set(murids.map(m => m.kelas))];
+            document.getElementById('total-kelas').textContent = uniqueKelas.length;
+            
+            // Calculate today's attendance percentage
+            const today = App.getCurrentDate();
+            const todayAbsensi = absensi.filter(a => a.date === today);
+            let percent = 0;
+            if (todayAbsensi.length > 0) {
+                const hadir = todayAbsensi.filter(a => a.status === 'H').length;
+                percent = Math.round((hadir / todayAbsensi.length) * 100);
+            }
+            document.getElementById('kehadiran-hari-ini').textContent = `${percent}%`;
+
+            // Alpha Warnings
+            const warnings = Storage.getAlphaWarnings();
+            const warningsContainer = document.getElementById('alpha-warnings');
+            
+            if (warnings.length === 0) {
+                warningsContainer.innerHTML = '<p class="text-center" style="color: var(--success)">Tidak ada peringatan. Semua murid hadir dengan baik.</p>';
+            } else {
+                let html = '<div class="grid-2">';
+                warnings.forEach(w => {
+                    html += `
+                        <div class="alert alert-danger">
+                            <strong>${w.murid.nama}</strong> (${w.murid.kelas})<br>
+                            Telah alpha ${w.consecutiveAlpha} hari berturut-turut.<br>
+                            Terakhir alpha: ${App.formatDate(w.lastDate)}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                warningsContainer.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+</html>
